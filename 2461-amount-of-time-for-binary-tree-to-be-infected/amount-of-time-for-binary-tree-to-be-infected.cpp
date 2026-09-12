@@ -11,64 +11,86 @@
  */
 class Solution {
 public:
+
+    TreeNode* letsf(TreeNode* root, int start) {
+    if (root == NULL)
+        return NULL;
+
+    if (root->val == start)
+        return root;
+
+    TreeNode* left = letsf(root->left, start);
+
+    if (left != NULL)
+        return left;
+
+    return letsf(root->right, start);
+    }
+
+
     int amountOfTime(TreeNode* root, int start) {
-        
-        unordered_map<TreeNode* , TreeNode*> mpp;
-        mpp[root] = NULL;
-        queue<TreeNode*> qu2;
-        qu2.push(root);
-        TreeNode* target = NULL;
-        while(!qu2.empty()){
-            TreeNode* node = qu2.front();
-            qu2.pop();
 
-            if(node->val == start){
-                target = node;
-            }
-
-            if(node->left){
-                mpp[node->left] = node;
-                qu2.push(node->left);
-            } 
-            if(node->right){
-                mpp[node->right] = node;
-                qu2.push(node->right);
-            }
-
+        if(root == NULL){
+            return NULL;
         }
+        
 
+        TreeNode* temp = root;
+        unordered_map<TreeNode*,TreeNode*> mpp;
+        queue<TreeNode*> qu;
+        qu.push(root);
+        mpp[root] = NULL;
 
-        queue<pair<TreeNode*,int>> qu;
-        qu.push({target,0});
-        unordered_set<TreeNode*> visited;
-        visited.insert(target);
-        int t = 0;
         while(!qu.empty()){
-            auto it = qu.front();
+
+            TreeNode* node = qu.front();
             qu.pop();
 
-            TreeNode* next = it.first;
-            int time = it.second;
-
-            t = max(time,t);
-
-            if(next->left != NULL && !visited.count(next->left)){
-                qu.push({next->left,time+1});
-                visited.insert(next->left);
+            if(node->left){
+                qu.push(node->left);
+                mpp[node->left] = node;
+            }
+            if(node->right){
+                qu.push(node->right);
+                mpp[node->right] = node;
             }
 
-            if(next->right != NULL && !visited.count(next->right)){
-                visited.insert(next->right);
-                qu.push({next->right,time+1});
-            }
-
-            if(mpp[next] != NULL && !visited.count(mpp[next])){
-                qu.push({mpp[next],time+1});
-                visited.insert(mpp[next]);
-            }
         }
 
-        return t;
+        TreeNode* find = letsf(root,start);
+
+        queue<pair<TreeNode*,int>> qu2;
+        qu2.push({find,0});
+
+        unordered_set<TreeNode*> visited;
+        visited.insert(find);
+        int time = 0;
+
+        while(!qu2.empty()){
+            auto p = qu2.front();
+            int t = p.second;
+            TreeNode* node2 = p.first;
+            qu2.pop();
+
+            time = max(time,t);
+
+            if(node2->left != NULL && !visited.count(node2->left)){
+                qu2.push({node2->left,t+1});
+                visited.insert(node2->left);
+            }
+            if(node2->right != NULL && !visited.count(node2->right)){
+                qu2.push({node2->right,t+1});
+                visited.insert(node2->right);
+            }
+            if(mpp[node2] != NULL && !visited.count(mpp[node2])){
+                qu2.push({mpp[node2],t+1});
+                visited.insert(mpp[node2]);
+            }
+
+        }
+
+        return time;
+
 
     }
 };
