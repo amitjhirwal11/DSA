@@ -9,7 +9,7 @@ public:
             if(s[i] == '('){
                 count1++;
             }
-            else if(count1){
+            else if(count1 && s[i] == ')'){
                 count1--;
             }
             else{
